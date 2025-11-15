@@ -4,10 +4,12 @@ import { authApi } from '@/services/api'
 
 export default function Register() {
   const [formData, setFormData] = useState({
+    username: '',
     email: '',
     first_name: '',
     last_name: '',
     student_id: '',
+    phone: '',
     password: '',
     password2: '',
   })
@@ -35,16 +37,19 @@ export default function Register() {
 
     try {
       await authApi.register({
+        username: formData.username,
         email: formData.email,
         first_name: formData.first_name,
         last_name: formData.last_name,
         student_id: formData.student_id,
+        phone: formData.phone,
         password: formData.password,
         password2: formData.password2,
       })
       navigate('/login', { state: { message: 'Registration successful! Please log in.' } })
     } catch (err: any) {
-      setError(err.response?.data?.email?.[0] || 'Registration failed')
+      const errMsg = err.response?.data?.username?.[0] || err.response?.data?.email?.[0] || 'Registration failed'
+      setError(errMsg)
     } finally {
       setLoading(false)
     }
@@ -62,6 +67,21 @@ export default function Register() {
         )}
 
         <form onSubmit={handleSubmit} className="space-y-4">
+          <div>
+            <label className="block text-gray-700 text-sm font-bold mb-2">
+              Username
+            </label>
+            <input
+              type="text"
+              name="username"
+              value={formData.username}
+              onChange={handleChange}
+              required
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              placeholder="alice"
+            />
+          </div>
+
           <div className="grid grid-cols-2 gap-4">
             <div>
               <label className="block text-gray-700 text-sm font-bold mb-2">

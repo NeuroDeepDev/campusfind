@@ -4,7 +4,7 @@ import { authApi } from '@/services/api'
 import { useAuthStore } from '@/stores/authStore'
 
 export default function Login() {
-  const [email, setEmail] = useState('')
+  const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
@@ -17,7 +17,7 @@ export default function Login() {
     setLoading(true)
 
     try {
-      const response = await authApi.login(email, password)
+      const response = await authApi.login(username, password)
       const { access, refresh } = response.data
       localStorage.setItem('refresh_token', refresh)
 
@@ -46,15 +46,15 @@ export default function Login() {
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
             <label className="block text-gray-700 text-sm font-bold mb-2">
-              Email
+              Username
             </label>
             <input
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              type="text"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
               required
               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-              placeholder="student@university.edu"
+              placeholder="alice"
             />
           </div>
 
