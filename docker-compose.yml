@@ -1,0 +1,76 @@
+version: '3.9'
+
+services:
+  db:
+    image: postgres:15-alpine
+    container_name: campusfind_db
+    environment:
+      POSTGRES_DB: campusfind
+      POSTGRES_USER: campusfind
+      POSTGRES_PASSWORD: campusfind_password_dev
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U campusfind"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    build: .
+    container_name: campusfind_backend
+    command: sh -c "python manage.py migrate && python manage.py load_sample_data || true && python manage.py runserver 0.0.0.0:8000"
+    environment:
+      DEBUG: "True"
+      SECRET_KEY: django-insecure-dev-key-change-in-production
+      ALLOWED_HOSTS: localhost,127.0.0.1,backend
+      DATABASE_URL: postgresql://campusfind:campusfind_password_dev@db:5432/campusfind
+      EMAIL_BACKEND: django.core.mail.backends.console.EmailBackend
+      CORS_ALLOWED_ORIGINS: http://localhost:5173,http://localhost:3000,http://127.0.0.1:5173,http://frontend:3000
+    ports:
+      - "8000:8000"
+    volumes:
+      - .:/app
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - campusfind_network
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: campusfind_frontend
+    environment:
+      VITE_API_URL: http://backend:8000/api
+    ports:
+      - "5173:5173"
+    depends_on:
+      - backend
+    networks:
+      - campusfind_network
+
+  nginx:
+    image: nginx:alpine
+    container_name: campusfind_nginx
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./ssl:/etc/nginx/ssl:ro
+    depends_on:
+      - backend
+      - frontend
+    networks:
+      - campusfind_network
+
+volumes:
+  postgres_data:
+
+networks:
+  campusfind_network:
+    driver: bridge
