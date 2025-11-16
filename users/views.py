@@ -40,7 +40,21 @@ class StudentViewSet(viewsets.ModelViewSet):
             serializer = StudentDetailSerializer(student)
             return Response(serializer.data)
         except Student.DoesNotExist:
-            return Response({'error': 'Student profile not found'}, status=status.HTTP_404_NOT_FOUND)
+            # If not a student, try to get as admin
+            try:
+                admin = Admin.objects.get(user=request.user)
+                serializer = AdminSerializer(admin)
+                return Response(serializer.data)
+            except Admin.DoesNotExist:
+                # Fallback: just return user info
+                return Response({
+                    'id': request.user.id,
+                    'username': request.user.username,
+                    'email': request.user.email,
+                    'first_name': request.user.first_name,
+                    'last_name': request.user.last_name,
+                    'is_staff': request.user.is_staff,
+                })
 
     @action(detail=False, methods=['put', 'patch'], permission_classes=[IsAuthenticated])
     def update_profile(self, request):
