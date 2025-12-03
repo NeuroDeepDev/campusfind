@@ -1,0 +1,11 @@
+{% extends 'base.html' %}
+{% block content %}
+  <h2>Reports for {{ student.name }}</h2>
+  <ul>
+    {% for r in reports %}
+      <li>{{ r.report_type }} - {{ r.item }} - {{ r.report_date }} - {{ r.details }}</li>
+    {% empty %}
+      <li>No reports</li>
+    {% endfor %}
+  </ul>
+{% endblock %}

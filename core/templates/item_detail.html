@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+{% block content %}
+  <h2>Item Detail: {{ item.name }}</h2>
+  <p><strong>Category:</strong> {{ item.category }}</p>
+  <p><strong>Status:</strong> {{ item.get_status_display }}</p>
+  <p><strong>Location:</strong> {{ item.location }}</p>
+  <p><strong>Description:</strong> {{ item.description }}</p>
+  <h3>Reports</h3>
+  <ul>
+    {% for r in item.reports.all %}
+      <li>{{ r.report_type }} by {{ r.reporter }} on {{ r.report_date }} — {{ r.details }}</li>
+    {% empty %}
+      <li>No reports</li>
+    {% endfor %}
+  </ul>
+  <h3>Claims</h3>
+  <ul>
+    {% for c in item.claims.all %}
+      <li>{{ c.claimer }} — {{ c.status }} — {{ c.claim_date }}</li>
+    {% empty %}
+      <li>No claims</li>
+    {% endfor %}
+  </ul>
+{% endblock %}

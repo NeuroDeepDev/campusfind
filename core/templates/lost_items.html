@@ -1,0 +1,11 @@
+{% extends 'base.html' %}
+{% block content %}
+  <h2>Lost Items</h2>
+  <ul>
+    {% for item in items %}
+      <li><a href="/items/{{ item.item_id }}/">{{ item.name }}</a> — {{ item.category }}</li>
+    {% empty %}
+      <li>No lost items.</li>
+    {% endfor %}
+  </ul>
+{% endblock %}

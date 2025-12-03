@@ -1,0 +1,32 @@
+[
+  {
+    "model": "core.category",
+    "pk": 1,
+    "fields": {"category_name": "Electronics"}
+  },
+  {
+    "model": "core.category",
+    "pk": 2,
+    "fields": {"category_name": "Clothing"}
+  },
+  {
+    "model": "core.location",
+    "pk": 1,
+    "fields": {"building": "Library", "area": "Entrance"}
+  },
+  {
+    "model": "core.student",
+    "pk": 1,
+    "fields": {"name": "Alice", "email": "alice@example.com", "phone": "1234567890", "dept": "CS", "year": 2}
+  },
+  {
+    "model": "core.item",
+    "pk": 1,
+    "fields": {"name": "USB Drive", "category": 1, "description": "Black USB stick", "found_date": "2025-12-01", "status": "FOUND", "location": 1}
+  },
+  {
+    "model": "core.report",
+    "pk": 1,
+    "fields": {"item": 1, "reporter": 1, "report_type": "FOUND", "report_date": "2025-12-01T10:00:00Z", "details": "Found at library entrance"}
+  }
+]

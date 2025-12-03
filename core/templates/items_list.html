@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+{% block content %}
+  <h2>All Items</h2>
+  <form id="search-form" method="get">
+    <input type="text" name="q" placeholder="Search" value="{{ q }}">
+    <select name="status">
+      <option value="">All</option>
+      <option value="LOST" {% if status=='LOST' %}selected{% endif %}>Lost</option>
+      <option value="FOUND" {% if status=='FOUND' %}selected{% endif %}>Found</option>
+      <option value="RETURNED" {% if status=='RETURNED' %}selected{% endif %}>Returned</option>
+    </select>
+    <button type="submit">Filter</button>
+  </form>
+  <p><a href="/items/add/">Add Item</a></p>
+  <ul>
+  {% for item in items %}
+    <li><a href="/items/{{ item.item_id }}/">{{ item.name }}</a> — {{ item.get_status_display }} — {{ item.category }}</li>
+  {% empty %}
+    <li>No items found.</li>
+  {% endfor %}
+  </ul>
+{% endblock %}
