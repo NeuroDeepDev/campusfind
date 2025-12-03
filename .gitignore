@@ -1,0 +1,9 @@
+# Python/Django
+__pycache__/
+venv/
+.env
+*.sqlite3
+/media/
+/staticfiles/
+node_modules/
+.DS_Store
