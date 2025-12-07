@@ -4,13 +4,13 @@ from .models import Student, Admin as AdminModel, Category, Location, Item, Repo
 
 @admin.register(Student)
 class StudentAdmin(admin.ModelAdmin):
-    list_display = ('student_id', 'name', 'email', 'dept', 'year')
+    list_display = ('student_id', 'name', 'email', 'dept', 'year', 'user')
     search_fields = ('name', 'email')
 
 
 @admin.register(AdminModel)
 class AdminModelAdmin(admin.ModelAdmin):
-    list_display = ('admin_id', 'name', 'email')
+    list_display = ('admin_id', 'name', 'email', 'user')
 
 
 @admin.register(Category)

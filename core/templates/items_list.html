@@ -5,9 +5,9 @@
     <input type="text" name="q" placeholder="Search" value="{{ q }}">
     <select name="status">
       <option value="">All</option>
-      <option value="LOST" {% if status=='LOST' %}selected{% endif %}>Lost</option>
-      <option value="FOUND" {% if status=='FOUND' %}selected{% endif %}>Found</option>
-      <option value="RETURNED" {% if status=='RETURNED' %}selected{% endif %}>Returned</option>
+        <option value="LOST" {% if status == 'LOST' %}selected{% endif %}>Lost</option>
+        <option value="FOUND" {% if status == 'FOUND' %}selected{% endif %}>Found</option>
+        <option value="RETURNED" {% if status == 'RETURNED' %}selected{% endif %}>Returned</option>
     </select>
     <button type="submit">Filter</button>
   </form>

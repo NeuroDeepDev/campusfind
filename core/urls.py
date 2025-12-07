@@ -14,4 +14,9 @@ urlpatterns = [
     path('students/', views.students_crud, name='students'),
     path('students/add/', views.add_student, name='add_student'),
     path('students/<int:student_id>/reports/', views.student_reports, name='student_reports'),
+    # auth
+    path('accounts/register/', views.register, name='register'),
+    path('accounts/login/', views.login_view, name='login'),
+    path('accounts/logout/', views.logout_view, name='logout'),
+    path('profile/', views.profile, name='profile'),
 ]

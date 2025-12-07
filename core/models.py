@@ -1,8 +1,11 @@
 from django.db import models
+from django.conf import settings
 
 
 class Student(models.Model):
     student_id = models.AutoField(primary_key=True)
+    # optional OneToOne link to Django User
+    user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, null=True, blank=True, related_name='student_profile')
     name = models.CharField(max_length=200)
     email = models.EmailField(unique=True)
     phone = models.CharField(max_length=50, blank=True, null=True)
@@ -15,6 +18,7 @@ class Student(models.Model):
 
 class Admin(models.Model):
     admin_id = models.AutoField(primary_key=True)
+    user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, null=True, blank=True, related_name='admin_profile')
     name = models.CharField(max_length=200)
     email = models.EmailField(unique=True)
 

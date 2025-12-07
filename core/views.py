@@ -3,6 +3,12 @@ from django.urls import reverse
 from django.db.models import Q
 from .models import Item, Report, Claim, Student, Category
 from .forms import ItemForm, ReportForm, ClaimForm, StudentForm
+from .forms import RegistrationForm
+from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth.forms import AuthenticationForm
+from django.contrib.auth.models import User
+from django.shortcuts import HttpResponse
 
 
 def home(request):
@@ -78,6 +84,52 @@ def submit_claim(request):
     else:
         form = ClaimForm()
     return render(request, 'submit_claim.html', {'form': form})
+
+
+def register(request):
+    if request.method == 'POST':
+        form = RegistrationForm(request.POST)
+        if form.is_valid():
+            user = form.save()
+            # create linked Student profile
+            name = form.cleaned_data.get('name')
+            Student.objects.create(user=user, name=name, email=user.email)
+            login(request, user)
+            return redirect('profile')
+    else:
+        form = RegistrationForm()
+    return render(request, 'register.html', {'form': form})
+
+
+def login_view(request):
+    if request.method == 'POST':
+        form = AuthenticationForm(request, data=request.POST)
+        if form.is_valid():
+            user = form.get_user()
+            login(request, user)
+            return redirect('profile')
+    else:
+        form = AuthenticationForm()
+    return render(request, 'login.html', {'form': form})
+
+
+def logout_view(request):
+    logout(request)
+    return redirect('home')
+
+
+@login_required
+def profile(request):
+    user = request.user
+    try:
+        student = user.student_profile
+    except Exception:
+        student = None
+    try:
+        adminp = user.admin_profile
+    except Exception:
+        adminp = None
+    return render(request, 'profile.html', {'user': user, 'student': student, 'adminp': adminp})
 
 
 def students_crud(request):
