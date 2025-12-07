@@ -22,7 +22,7 @@
           <img src="https://via.placeholder.com/150" alt="item image">
           <div class="meta">
             <h3>{{ claim.item.name }}</h3>
-            <p>Claimed by: {{ claim.claimer.name if claim.claimer else 'Anonymous' }}</p>
+            <p>Claimed by: {% if claim.claimer %}{{ claim.claimer.name }}{% else %}Anonymous{% endif %}</p>
             <p>Status: {{ claim.get_status_display }}</p>
           </div>
         </article>
