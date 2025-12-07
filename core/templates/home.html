@@ -1,6 +1,42 @@
 {% extends 'base.html' %}
 {% block content %}
   <h1>CampusFind</h1>
-  <p>Welcome to the simplified CampusFind app.</p>
-  <p>Use the navigation to browse items, submit reports, and manage claims.</p>
+  <section class="about">
+    <h2>About</h2>
+    <p>CampusFind helps students and staff report, find and claim lost items across campus. We connect finders with owners and keep a simple log of reports and claims.</p>
+    <blockquote>"Lost something? Report it. Found something? Return it."
+    </blockquote>
+    <p>Quick example: Alice reported a <strong>USB Drive</strong> found at the library. The owner was able to claim it.</p>
+    <p>
+      <a class="cta" href="/accounts/register/">Register</a>
+      <a class="cta" href="/accounts/login/">Login</a>
+    </p>
+  </section>
+
+  <section class="success-stories">
+    <h2>Success Stories</h2>
+    <div class="stories">
+      {% comment %} Prefer claims that were approved or items that are returned. If none, show a default example. {% endcomment %}
+      {% for claim in claims %}
+        <article class="story">
+          <img src="https://via.placeholder.com/150" alt="item image">
+          <div class="meta">
+            <h3>{{ claim.item.name }}</h3>
+            <p>Claimed by: {{ claim.claimer.name if claim.claimer else 'Anonymous' }}</p>
+            <p>Status: {{ claim.get_status_display }}</p>
+          </div>
+        </article>
+      {% empty %}
+        <article class="story">
+          <img src="https://via.placeholder.com/150" alt="USB Drive">
+          <div class="meta">
+            <h3>USB Drive</h3>
+            <p>Claimed by: Alice</p>
+            <p>Status: Returned</p>
+          </div>
+        </article>
+      {% endfor %}
+    </div>
+  </section>
 {% endblock %}
+

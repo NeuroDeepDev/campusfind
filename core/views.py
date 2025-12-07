@@ -12,7 +12,9 @@ from django.shortcuts import HttpResponse
 
 
 def home(request):
-    return render(request, 'home.html')
+    # Provide approved claims as success stories (if any)
+    claims = Claim.objects.filter(status='APPROVED').select_related('item','claimer')[:6]
+    return render(request, 'home.html', {'claims': claims})
 
 
 def items_list(request):
