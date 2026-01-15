@@ -1,42 +1,122 @@
 {% extends 'base.html' %}
+
 {% block content %}
-  <h1>CampusFind</h1>
-  <section class="about">
-    <h2>About</h2>
-    <p>CampusFind helps students and staff report, find and claim lost items across campus. We connect finders with owners and keep a simple log of reports and claims.</p>
-    <blockquote>"Lost something? Report it. Found something? Return it."
-    </blockquote>
-    <p>Quick example: Alice reported a <strong>USB Drive</strong> found at the library. The owner was able to claim it.</p>
-    <p>
-      <a class="cta" href="/accounts/register/">Register</a>
-      <a class="cta" href="/accounts/login/">Login</a>
-    </p>
+  <!-- Hero Section -->
+  <section class="hero">
+    <h1>CampusFind</h1>
+    <p class="tagline">Recover Lost Items. Connect Community. Simple and Fast.</p>
   </section>
 
+  <!-- About Section (Visible to All) -->
+  <section class="about">
+    <h2>How CampusFind Works</h2>
+    <div class="about-cards">
+      <div class="card">
+        <h3>📋 What We Do</h3>
+        <p>CampusFind is a platform where students and staff report lost and found items. We maintain a simple, searchable database to help reunite people with their belongings.</p>
+      </div>
+      <div class="card">
+        <h3>🔍 Our Services</h3>
+        <p>Report lost items, browse found items, submit claims, and track the status of your reports. Everything you need to recover your lost belongings is here.</p>
+      </div>
+      <div class="card">
+        <h3>🤝 How We Help</h3>
+        <p>Our community-driven approach means that honest finders return items and owners get reunited with what matters to them. Together, we're making campus safer.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA Section (Only for Non-Authenticated Users) -->
+  {% if not request.user.is_authenticated %}
+    <section class="cta-section">
+      <h2>Ready to Get Started?</h2>
+      <p>Join CampusFind to report lost items, claim found items, and help reunite the community.</p>
+      <div class="cta-buttons">
+        <a href="/accounts/register/" class="cta-btn primary">Register Now</a>
+        <a href="/accounts/login/" class="cta-btn secondary">Login to Your Account</a>
+      </div>
+    </section>
+  {% endif %}
+
+  <!-- Success Stories Section (Visible to All) -->
   <section class="success-stories">
     <h2>Success Stories</h2>
     <div class="stories">
-      {% comment %} Prefer claims that were approved or items that are returned. If none, show a default example. {% endcomment %}
       {% for claim in claims %}
         <article class="story">
-          <img src="https://via.placeholder.com/150" alt="item image">
+          <img src="https://via.placeholder.com/250/28a745/ffffff?text={{ claim.item.name|truncatewords:2 }}" alt="{{ claim.item.name }}">
           <div class="meta">
             <h3>{{ claim.item.name }}</h3>
-            <p>Claimed by: {% if claim.claimer %}{{ claim.claimer.name }}{% else %}Anonymous{% endif %}</p>
-            <p>Status: {{ claim.get_status_display }}</p>
+            <p><strong>Claimed by:</strong> {% if claim.claimer.student_profile.user %}{{ claim.claimer.student_profile.user.get_full_name|default:claim.claimer.student_profile.user.username }}{% else %}Anonymous{% endif %}</p>
+            <p><strong>Status:</strong> {{ claim.get_status_display }}</p>
           </div>
         </article>
       {% empty %}
         <article class="story">
-          <img src="https://via.placeholder.com/150" alt="USB Drive">
+          <img src="https://via.placeholder.com/250/28a745/ffffff?text=USB+Drive" alt="USB Drive">
           <div class="meta">
             <h3>USB Drive</h3>
-            <p>Claimed by: Alice</p>
-            <p>Status: Returned</p>
+            <p><strong>Claimed by:</strong> Alice Chen</p>
+            <p><strong>Status:</strong> Returned</p>
+          </div>
+        </article>
+        <article class="story">
+          <img src="https://via.placeholder.com/250/28a745/ffffff?text=Keys" alt="Keys">
+          <div class="meta">
+            <h3>Set of Keys</h3>
+            <p><strong>Claimed by:</strong> Bob Smith</p>
+            <p><strong>Status:</strong> Returned</p>
+          </div>
+        </article>
+        <article class="story">
+          <img src="https://via.placeholder.com/250/28a745/ffffff?text=Wallet" alt="Wallet">
+          <div class="meta">
+            <h3>Leather Wallet</h3>
+            <p><strong>Claimed by:</strong> Carol Davis</p>
+            <p><strong>Status:</strong> Returned</p>
           </div>
         </article>
       {% endfor %}
     </div>
   </section>
+
+  <!-- Dashboard Section (Only for Authenticated Users) -->
+  {% if request.user.is_authenticated %}
+    <section class="dashboard-section">
+      <h2>Quick Actions</h2>
+      <div class="dashboard-cards">
+        <a href="/report-lost/" class="dashboard-card">
+          <div class="icon">📝</div>
+          <h3>Report Lost Item</h3>
+          <p>Tell us what you lost and where. We'll help you find it.</p>
+        </a>
+        <a href="/report-found/" class="dashboard-card">
+          <div class="icon">🔎</div>
+          <h3>Report Found Item</h3>
+          <p>Found something? Report it and help reunite it with its owner.</p>
+        </a>
+        <a href="/items/lost/" class="dashboard-card">
+          <div class="icon">👁️</div>
+          <h3>View Lost Items</h3>
+          <p>Search through items reported as lost by others.</p>
+        </a>
+        <a href="/items/found/" class="dashboard-card">
+          <div class="icon">📦</div>
+          <h3>View Found Items</h3>
+          <p>Browse items that have been found and are waiting for claims.</p>
+        </a>
+        <a href="/my-reports/" class="dashboard-card">
+          <div class="icon">📊</div>
+          <h3>My Reports</h3>
+          <p>Track the status of your lost and found reports.</p>
+        </a>
+        <a href="/my-claims/" class="dashboard-card">
+          <div class="icon">✋</div>
+          <h3>My Claims</h3>
+          <p>Manage your claims and follow up on items you've found.</p>
+        </a>
+      </div>
+    </section>
+  {% endif %}
 {% endblock %}
 
