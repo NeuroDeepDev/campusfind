@@ -2,10 +2,43 @@
 {% block content %}
   <h2>Report Lost Item</h2>
   <div class="card">
+    <p><strong>Reporter:</strong> {{ user.get_full_name|default:user.username }} ({{ user.email }})</p>
     <form method="post" enctype="multipart/form-data">
       {% csrf_token %}
       {{ form.as_p }}
-      <button type="submit">Submit Report</button>
+      <button type="submit" id="submit-btn">Submit Report</button>
     </form>
   </div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  const itemTypes = {{ item_types|safe }};
+  const categorySelect = document.getElementById('id_category');
+  const itemTypeSelect = document.getElementById('id_item_type');
+  const submitBtn = document.getElementById('submit-btn');
+
+  function updateItemTypes() {
+    const selectedCategory = categorySelect.value;
+    const categoryName = categorySelect.options[categorySelect.selectedIndex].text;
+    itemTypeSelect.innerHTML = '';
+    if (itemTypes[categoryName]) {
+      itemTypes[categoryName].forEach(type => {
+        const option = document.createElement('option');
+        option.value = type;
+        option.text = type;
+        itemTypeSelect.appendChild(option);
+      });
+    }
+  }
+
+  categorySelect.addEventListener('change', updateItemTypes);
+  updateItemTypes();  // Initial load
+
+  // Disable submit button after click to prevent duplicates
+  submitBtn.addEventListener('click', function() {
+    submitBtn.disabled = true;
+    submitBtn.textContent = 'Submitting...';
+  });
+</script>
 {% endblock %}

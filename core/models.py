@@ -130,6 +130,7 @@ class LostItem(models.Model):
 
     lost_item_id = models.AutoField(primary_key=True)
     item_name = models.CharField(max_length=200)
+    item_type = models.CharField(max_length=200, blank=True, null=True)  # Add this
     description = models.TextField(blank=True, null=True)
     category = models.ForeignKey(Category, on_delete=models.CASCADE, related_name='lost_items')
     location = models.CharField(max_length=200)

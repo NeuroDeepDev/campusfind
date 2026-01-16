@@ -45,9 +45,11 @@ class RegistrationForm(UserCreationForm):
 
 
 class LostItemForm(forms.ModelForm):
+    item_type = forms.ChoiceField(choices=[], required=False)  # Dynamic choices
+
     class Meta:
         model = LostItem
-        fields = ['item_name', 'description', 'category', 'location', 'date_time', 'image', 'contact_preference', 'reporter_type']
+        fields = ['item_name', 'item_type', 'description', 'category', 'location', 'date_time', 'image', 'contact_preference']
         widgets = {
             'item_name': forms.TextInput(attrs={'placeholder': 'Enter item name'}),
             'description': forms.Textarea(attrs={'placeholder': 'Brief description'}),
@@ -55,5 +57,9 @@ class LostItemForm(forms.ModelForm):
             'date_time': forms.DateTimeInput(attrs={'placeholder': 'Date & Time of loss'}),
             'image': forms.ClearableFileInput(attrs={'required': False}),
             'contact_preference': forms.Select(choices=[('email', 'Email'), ('phone', 'Phone')]),
-            'reporter_type': forms.Select(choices=LostItem.REPORTER_TYPE_CHOICES),
         }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # Set initial empty choices for item_type
+        self.fields['item_type'].choices = []

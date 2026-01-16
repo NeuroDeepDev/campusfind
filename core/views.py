@@ -153,10 +153,22 @@ def add_student(request):
 
 
 class LostItemReportView(View):
+    def get_item_types(self):
+        return {
+            'Electronics': ['Phone', 'Laptop', 'Charger', 'Earbuds', 'Other'],
+            'Documents': ['ID Card', 'Aadhaar', 'Passport', 'Certificates', 'Other'],
+            'Accessories': ['Wallet', 'Watch', 'Bag', 'Other'],
+            'Books & Stationery': ['Book', 'Notebook', 'Pen', 'Other'],
+            'Clothing': ['Shirt', 'Pants', 'Jacket', 'Other'],
+            'Keys': ['House Key', 'Car Key', 'Locker Key', 'Other'],
+            'Others': ['Other']
+        }
+
     def get(self, request):
         # Render the form for reporting lost items
         form = LostItemForm()
-        return render(request, 'lost_items.html', {'form': form})
+        item_types = self.get_item_types()
+        return render(request, 'lost_items.html', {'form': form, 'item_types': item_types})
 
     def post(self, request):
         # Handle form submission
@@ -165,7 +177,13 @@ class LostItemReportView(View):
             # Save the report
             report = form.save(commit=False)
             report.reporter = request.user
+            # Auto-assign reporter_type
+            if hasattr(request.user, 'student_profile') and request.user.student_profile:
+                report.reporter_type = 'STUDENT'
+            else:
+                report.reporter_type = 'VISITOR'  # Default if not student
             report.save()
             messages.success(request, 'Your report has been submitted successfully.')
             return redirect('home')
-        return render(request, 'lost_items.html', {'form': form})
+        item_types = self.get_item_types()
+        return render(request, 'lost_items.html', {'form': form, 'item_types': item_types})
