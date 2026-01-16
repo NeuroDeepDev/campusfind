@@ -3,12 +3,14 @@ from django.urls import reverse
 from django.db.models import Q
 from .models import Item, Report, Claim, Student, Category
 from .forms import ItemForm, ReportForm, ClaimForm, StudentForm
-from .forms import RegistrationForm
+from .forms import RegistrationForm, LostItemForm
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth.models import User
 from django.shortcuts import HttpResponse
+from django.views import View
+from django.contrib import messages
 
 
 def home(request):
@@ -148,3 +150,22 @@ def add_student(request):
     else:
         form = StudentForm()
     return render(request, 'student_form.html', {'form': form})
+
+
+class LostItemReportView(View):
+    def get(self, request):
+        # Render the form for reporting lost items
+        form = LostItemForm()
+        return render(request, 'lost_items.html', {'form': form})
+
+    def post(self, request):
+        # Handle form submission
+        form = LostItemForm(request.POST, request.FILES)
+        if form.is_valid():
+            # Save the report
+            report = form.save(commit=False)
+            report.reporter = request.user
+            report.save()
+            messages.success(request, 'Your report has been submitted successfully.')
+            return redirect('home')
+        return render(request, 'lost_items.html', {'form': form})

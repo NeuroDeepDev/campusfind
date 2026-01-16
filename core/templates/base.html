@@ -7,27 +7,48 @@
   <link rel="stylesheet" href="/static/style.css">
 </head>
 <body>
-  <header>
-    <div class="topbar">
-      <div class="top-left">
+  <header class="main-header">
+    <div class="header-container">
+      <!-- Left Side: Logo/Brand -->
+      <div class="header-left">
+        <a href="/" class="campus-find-logo" onclick="clearAllFilters(event)">
+          <span class="logo-icon">🎓</span>
+          <span class="logo-text">CampusFind</span>
+        </a>
+      </div>
+
+      <!-- Right Side: Auth Info & Buttons -->
+      <div class="header-right">
         {% if request.user.is_authenticated %}
-          <a href="/profile/">{{ request.user.username }}</a> |
-          <a href="/accounts/logout/">Logout</a>
+          <span class="user-welcome">Welcome, <span class="user-name">{{ request.user.username }}</span></span>
+          <a href="/profile/" class="auth-btn profile-btn">Profile</a>
+          <a href="/accounts/logout/" class="auth-btn logout-btn">Logout</a>
         {% else %}
-          <a href="/accounts/login/">Login</a> |
-          <a href="/accounts/register/">Register</a>
+          <a href="/accounts/login/" class="auth-btn login-btn">Login</a>
+          <a href="/accounts/register/" class="auth-btn register-btn">Register</a>
         {% endif %}
       </div>
+
+      <!-- Hamburger Menu Toggle (Mobile Only) -->
+      <button class="hamburger-menu" id="hamburger-toggle" aria-label="Toggle navigation menu">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
     </div>
-    <nav>
-      <a href="/">Home</a> |
-      <a href="/items/">Items</a> |
-      <a href="/lost/">Lost</a> |
-      <a href="/found/">Found</a> |
-      <a href="/found/unclaimed/">Unclaimed Found</a> |
-      <a href="/reports/submit/">Submit Report</a> |
-      <a href="/claims/submit/">Submit Claim</a> |
-      <a href="/students/">Students</a>
+
+    <!-- Navigation Menu -->
+    <nav class="main-nav" id="mobile-nav">
+      <div class="nav-container">
+        <a href="/" class="nav-item">Home</a>
+        <a href="/items/" class="nav-item">All Items</a>
+        <a href="/lost/" class="nav-item">Lost Items</a>
+        <a href="/found/" class="nav-item">Found Items</a>
+        <a href="/found/unclaimed/" class="nav-item">Unclaimed</a>
+        <a href="/reports/submit/" class="nav-item">Report Lost</a>
+        <a href="/claims/submit/" class="nav-item">Claim Item</a>
+        <a href="/students/" class="nav-item">Community</a>
+      </div>
     </nav>
   </header>
   <main>

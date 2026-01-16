@@ -1,11 +1,11 @@
 {% extends 'base.html' %}
 {% block content %}
-  <h2>Lost Items</h2>
-  <ul>
-    {% for item in items %}
-      <li><a href="/items/{{ item.item_id }}/">{{ item.name }}</a> — {{ item.category }}</li>
-    {% empty %}
-      <li>No lost items.</li>
-    {% endfor %}
-  </ul>
+  <h2>Report Lost Item</h2>
+  <div class="card">
+    <form method="post" enctype="multipart/form-data">
+      {% csrf_token %}
+      {{ form.as_p }}
+      <button type="submit">Submit Report</button>
+    </form>
+  </div>
 {% endblock %}

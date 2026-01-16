@@ -1,5 +1,5 @@
 from django import forms
-from .models import Item, Report, Claim, Student
+from .models import Item, Report, Claim, Student, LostItem
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
 
@@ -42,3 +42,18 @@ class RegistrationForm(UserCreationForm):
         if commit:
             user.save()
         return user
+
+
+class LostItemForm(forms.ModelForm):
+    class Meta:
+        model = LostItem
+        fields = ['item_name', 'description', 'category', 'location', 'date_time', 'image', 'contact_preference', 'reporter_type']
+        widgets = {
+            'item_name': forms.TextInput(attrs={'placeholder': 'Enter item name'}),
+            'description': forms.Textarea(attrs={'placeholder': 'Brief description'}),
+            'location': forms.TextInput(attrs={'placeholder': 'Location of loss'}),
+            'date_time': forms.DateTimeInput(attrs={'placeholder': 'Date & Time of loss'}),
+            'image': forms.ClearableFileInput(attrs={'required': False}),
+            'contact_preference': forms.Select(choices=[('email', 'Email'), ('phone', 'Phone')]),
+            'reporter_type': forms.Select(choices=LostItem.REPORTER_TYPE_CHOICES),
+        }

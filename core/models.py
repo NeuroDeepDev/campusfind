@@ -112,3 +112,34 @@ class Audit(models.Model):
 
     def __str__(self):
         return f"Audit {self.audit_id} - {self.op_type}"
+
+
+class LostItem(models.Model):
+    REPORTER_TYPE_CHOICES = [
+        ('STUDENT', 'Student'),
+        ('FACULTY', 'Faculty'),
+        ('STAFF', 'Staff'),
+        ('VISITOR', 'Visitor'),
+    ]
+
+    STATUS_CHOICES = [
+        ('LOST', 'Lost'),
+        ('FOUND', 'Found'),
+        ('RETURNED', 'Returned'),
+    ]
+
+    lost_item_id = models.AutoField(primary_key=True)
+    item_name = models.CharField(max_length=200)
+    description = models.TextField(blank=True, null=True)
+    category = models.ForeignKey(Category, on_delete=models.CASCADE, related_name='lost_items')
+    location = models.CharField(max_length=200)
+    date_time = models.DateTimeField()
+    image = models.ImageField(upload_to='lost_items/', blank=True, null=True)
+    contact_preference = models.CharField(max_length=20, choices=[('email', 'Email'), ('phone', 'Phone')])
+    reporter = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='lost_reports')
+    reporter_type = models.CharField(max_length=20, choices=REPORTER_TYPE_CHOICES)
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='LOST')
+    report_date = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"Lost Item: {self.item_name} ({self.lost_item_id})"
