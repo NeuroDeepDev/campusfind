@@ -1,30 +1,50 @@
+(function () {
+  const savedTheme = localStorage.getItem('theme') || 'light';
+  document.documentElement.setAttribute('data-theme', savedTheme);
+})();
+
 // Clear all filters and state when CampusFind logo is clicked
 function clearAllFilters(e) {
-  // Clear localStorage
+  // Clear localStorage except theme
+  const currentTheme = localStorage.getItem('theme');
   localStorage.clear();
-  
+  if (currentTheme) {
+    localStorage.setItem('theme', currentTheme);
+  }
+
   // Clear sessionStorage
   sessionStorage.clear();
-  
+
   // Clear URL query parameters by navigating to clean home URL
   e.preventDefault();
   window.location.href = '/';
 }
 
-// Hamburger menu toggle for mobile
-document.addEventListener('DOMContentLoaded', function(){
+document.addEventListener('DOMContentLoaded', function () {
+  
+  const themeToggle = document.getElementById('theme-toggle');
+  if (themeToggle) {
+    themeToggle.addEventListener('click', function () {
+      const currentTheme = document.documentElement.getAttribute('data-theme');
+      const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+
+      document.documentElement.setAttribute('data-theme', newTheme);
+      localStorage.setItem('theme', newTheme);
+    });
+  }
+
   const hamburgerBtn = document.getElementById('hamburger-toggle');
   const mobileNav = document.getElementById('mobile-nav');
 
   if (hamburgerBtn && mobileNav) {
-    hamburgerBtn.addEventListener('click', function() {
+    hamburgerBtn.addEventListener('click', function () {
       hamburgerBtn.classList.toggle('active');
       mobileNav.classList.toggle('mobile-hidden');
     });
 
     // Close menu when a nav item is clicked
-    document.querySelectorAll('.nav-item').forEach(function(item) {
-      item.addEventListener('click', function() {
+    document.querySelectorAll('.nav-item').forEach(function (item) {
+      item.addEventListener('click', function () {
         hamburgerBtn.classList.remove('active');
         mobileNav.classList.add('mobile-hidden');
       });
@@ -32,9 +52,9 @@ document.addEventListener('DOMContentLoaded', function(){
   }
 
   // Confirm delete helpers (if any delete buttons exist)
-  document.querySelectorAll('.confirm-delete').forEach(function(btn){
-    btn.addEventListener('click', function(e){
-      if(!confirm('Are you sure you want to delete this item?')){
+  document.querySelectorAll('.confirm-delete').forEach(function (btn) {
+    btn.addEventListener('click', function (e) {
+      if (!confirm('Are you sure you want to delete this item?')) {
         e.preventDefault();
       }
     });
@@ -42,8 +62,8 @@ document.addEventListener('DOMContentLoaded', function(){
 
   // Simple client-side search filtering if present
   var searchForm = document.getElementById('search-form');
-  if(searchForm){
-    searchForm.addEventListener('submit', function(){
+  if (searchForm) {
+    searchForm.addEventListener('submit', function () {
       // let the server handle search; this is a placeholder
     });
   }
