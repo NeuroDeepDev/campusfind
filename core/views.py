@@ -95,9 +95,10 @@ def register(request):
         form = RegistrationForm(request.POST)
         if form.is_valid():
             user = form.save()
-            # create linked Student profile
             name = form.cleaned_data.get('name')
-            Student.objects.create(user=user, name=name, email=user.email)
+            email = form.cleaned_data.get('email')
+            phone = form.cleaned_data.get('phone')
+            Student.objects.create(user=user, name=name, email=email or '', phone=phone or '')
             login(request, user)
             return redirect('profile')
     else:

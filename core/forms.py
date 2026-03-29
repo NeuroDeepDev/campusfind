@@ -29,16 +29,34 @@ class StudentForm(forms.ModelForm):
 
 
 class RegistrationForm(UserCreationForm):
-    email = forms.EmailField(required=True)
-    name = forms.CharField(required=True)
+    username = forms.CharField(required=True, max_length=150, label='Username')
+    name = forms.CharField(required=True, max_length=200, label='Full Name')
+    email = forms.EmailField(required=False, label='Gmail ID', help_text='Optional; must be a Gmail address if provided.')
+    phone = forms.CharField(required=False, max_length=20, label='Phone Number', help_text='Optional; use international format if possible.')
 
     class Meta:
         model = User
-        fields = ("username", "email", "password1", "password2", "name")
+        fields = ('username', 'name', 'email', 'phone', 'password1', 'password2')
+
+    def clean(self):
+        cleaned_data = super().clean()
+        email = cleaned_data.get('email', '').strip()
+        phone = cleaned_data.get('phone', '').strip()
+
+        if not email and not phone:
+            raise forms.ValidationError('Please provide either a Gmail ID or a phone number.')
+
+        if email and not email.lower().endswith('@gmail.com'):
+            raise forms.ValidationError('Please provide a valid Gmail address (example@gmail.com).')
+
+        cleaned_data['email'] = email
+        cleaned_data['phone'] = phone
+        return cleaned_data
 
     def save(self, commit=True):
         user = super().save(commit=False)
-        user.email = self.cleaned_data['email']
+        email = self.cleaned_data.get('email', '').strip()
+        user.email = email
         if commit:
             user.save()
         return user
