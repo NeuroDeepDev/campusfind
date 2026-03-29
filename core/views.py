@@ -103,6 +103,7 @@ def register(request):
             return redirect('profile')
     else:
         form = RegistrationForm()
+        
     return render(request, 'register.html', {'form': form})
 
 
