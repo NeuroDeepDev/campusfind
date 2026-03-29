@@ -19,17 +19,10 @@
         </div>
 
         <div class="form-row">
-          <label for="id_email">Gmail ID</label>
-          {{ form.email }}
-          <small class="field-help">Optional: use an @gmail.com address.</small>
-          {% if form.email.errors %}<div class="form-error">{{ form.email.errors }}</div>{% endif %}
-        </div>
-
-        <div class="form-row">
-          <label for="id_phone">Phone Number</label>
-          {{ form.phone }}
-          <small class="field-help">Optional but recommended if you don’t have Gmail.</small>
-          {% if form.phone.errors %}<div class="form-error">{{ form.phone.errors }}</div>{% endif %}
+          <label for="id_contact">Gmail ID or Phone Number</label>
+          {{ form.contact }}
+          <small class="field-help">Enter either a @gmail.com address or your phone number.</small>
+          {% if form.contact.errors %}<div class="form-error">{{ form.contact.errors }}</div>{% endif %}
         </div>
 
         <div class="form-row">

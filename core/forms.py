@@ -31,32 +31,38 @@ class StudentForm(forms.ModelForm):
 class RegistrationForm(UserCreationForm):
     username = forms.CharField(required=True, max_length=150, label='Username')
     name = forms.CharField(required=True, max_length=200, label='Full Name')
-    email = forms.EmailField(required=False, label='Gmail ID', help_text='Optional; must be a Gmail address if provided.')
-    phone = forms.CharField(required=False, max_length=20, label='Phone Number', help_text='Optional; use international format if possible.')
+    contact = forms.CharField(required=True, max_length=254, label='Gmail ID or Phone Number',
+        help_text='Enter either your Gmail (example@gmail.com) or phone number.')
 
     class Meta:
         model = User
-        fields = ('username', 'name', 'email', 'phone', 'password1', 'password2')
+        fields = ('username', 'name', 'contact', 'password1', 'password2')
 
     def clean(self):
         cleaned_data = super().clean()
-        email = cleaned_data.get('email', '').strip()
-        phone = cleaned_data.get('phone', '').strip()
+        contact = cleaned_data.get('contact', '').strip()
 
-        if not email and not phone:
-            raise forms.ValidationError('Please provide either a Gmail ID or a phone number.')
+        if not contact:
+            raise forms.ValidationError('Please provide your Gmail ID or phone number.')
 
-        if email and not email.lower().endswith('@gmail.com'):
-            raise forms.ValidationError('Please provide a valid Gmail address (example@gmail.com).')
+        if '@' in contact:
+            if not contact.lower().endswith('@gmail.com'):
+                raise forms.ValidationError('Please provide a valid Gmail address (must end with @gmail.com).')
+            cleaned_data['email'] = contact.lower()
+            cleaned_data['phone'] = ''
+        else:
+            phone = ''.join([c for c in contact if c.isdigit() or c == '+'])
+            if not phone or len(phone) < 7:
+                raise forms.ValidationError('Please provide a valid phone number with at least 7 digits.')
+            cleaned_data['phone'] = phone
+            cleaned_data['email'] = ''
 
-        cleaned_data['email'] = email
-        cleaned_data['phone'] = phone
         return cleaned_data
 
     def save(self, commit=True):
         user = super().save(commit=False)
-        email = self.cleaned_data.get('email', '').strip()
-        user.email = email
+        contact_email = self.cleaned_data.get('email', '')
+        user.email = contact_email
         if commit:
             user.save()
         return user
