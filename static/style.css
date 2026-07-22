@@ -775,6 +775,26 @@ form .password-wrapper input {
   padding-right: 52px !important;
 }
 
+/* Messages shown in forms (errors, info) */
+.form-messages {
+  list-style: none;
+  padding: 0.6rem 0;
+  margin: 0 0 0.8rem 0;
+}
+.form-messages .message {
+  padding: 0.6rem 0.9rem;
+  border-radius: 6px;
+  margin-bottom: 0.4rem;
+  background: rgba(255, 235, 238, 0.9);
+  color: #b00020;
+  border: 1px solid rgba(176, 0, 32, 0.12);
+}
+.form-messages .message.info {
+  background: rgba(232, 245, 253, 0.9);
+  color: #0b63a8;
+  border: 1px solid rgba(11, 99, 168, 0.12);
+}
+
 /* Hero Section */
 .hero {
   text-align: center;

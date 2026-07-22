@@ -11,6 +11,7 @@ from django.contrib.auth.models import User
 from django.shortcuts import HttpResponse
 from django.views import View
 from django.contrib import messages
+from django.utils.safestring import mark_safe
 
 
 def home(request):
@@ -114,6 +115,17 @@ def login_view(request):
             user = form.get_user()
             login(request, user)
             return redirect('profile')
+        else:
+            # Provide clearer feedback when the username does not exist
+            username = request.POST.get('username')
+            if username:
+                try:
+                    User.objects.get(username=username)
+                except User.DoesNotExist:
+                    msg = mark_safe(
+                        'User not found. This account is not registered. '
+                        '<a href="/accounts/register/">Register here</a>.')
+                    messages.error(request, msg)
     else:
         form = AuthenticationForm()
     return render(request, 'login.html', {'form': form})
