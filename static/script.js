@@ -20,8 +20,7 @@ function clearAllFilters(e) {
   window.location.href = '/';
 }
 
-document.addEventListener('DOMContentLoaded', function () {
-  
+function initPage() {
   const themeToggle = document.getElementById('theme-toggle');
   if (themeToggle) {
     themeToggle.addEventListener('click', function () {
@@ -67,4 +66,31 @@ document.addEventListener('DOMContentLoaded', function () {
       // let the server handle search; this is a placeholder
     });
   }
-});
+
+  // Password show/hide toggle: buttons with class .password-toggle-btn
+  document.querySelectorAll('.password-toggle-btn').forEach(function (btn) {
+    btn.addEventListener('click', function (ev) {
+      ev.preventDefault();
+      var wrapper = btn.closest('.password-wrapper');
+      if (!wrapper) return;
+      var input = wrapper.querySelector('input[type="password"], input[type="text"]');
+      if (!input) return;
+      var isHidden = input.getAttribute('type') === 'password';
+      if (isHidden) {
+        input.setAttribute('type', 'text');
+        btn.setAttribute('aria-pressed', 'true');
+        btn.setAttribute('aria-label', 'Hide password');
+      } else {
+        input.setAttribute('type', 'password');
+        btn.setAttribute('aria-pressed', 'false');
+        btn.setAttribute('aria-label', 'Show password');
+      }
+    });
+  });
+}
+
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', initPage);
+} else {
+  initPage();
+}

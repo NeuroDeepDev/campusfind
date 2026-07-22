@@ -1,10 +1,37 @@
 {% extends 'base.html' %}
 {% block content %}
   <h2>Login</h2>
-  <form method="post">
+  <form method="post" class="auth-form">
     {% csrf_token %}
-    {{ form.as_p }}
-    <button type="submit">Login</button>
+
+    <div class="form-row">
+      {{ form.username.label_tag }}
+      {{ form.username }}
+      {% if form.username.errors %}
+        <div class="field-errors">{{ form.username.errors }}</div>
+      {% endif %}
+    </div>
+
+    <div class="form-row password-row">
+      {{ form.password.label_tag }}
+      <div class="password-wrapper">
+        {{ form.password }}
+        <button type="button" class="password-toggle-btn" aria-label="Show password" aria-pressed="false">
+          <!-- eye / eye-off svg icon (will be toggled by JS) -->
+          <svg class="eye-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8S1 12 1 12z"></path>
+            <circle cx="12" cy="12" r="3"></circle>
+          </svg>
+        </button>
+      </div>
+      {% if form.password.errors %}
+        <div class="field-errors">{{ form.password.errors }}</div>
+      {% endif %}
+    </div>
+
+    <div class="form-row">
+      <button type="submit" class="primary-btn">Login</button>
+    </div>
   </form>
   <p>Don't have an account? <a href="/accounts/register/">Register</a></p>
 {% endblock %}

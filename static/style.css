@@ -685,6 +685,96 @@ main {
   padding: 2rem;
 }
 
+/* Simple form styles for auth forms */
+.auth-form {
+  max-width: 520px;
+  margin: 1.5rem auto;
+  background: var(--card-bg);
+  padding: 1.5rem;
+  border-radius: 12px;
+  border: 1px solid var(--border-color);
+}
+
+.auth-form .form-row {
+  margin-bottom: 1rem;
+}
+
+.auth-form input[type="text"],
+.auth-form input[type="password"],
+.auth-form input[type="email"] {
+  width: 100%;
+  padding: 0.9rem 0.9rem;
+  border-radius: 6px;
+  border: 1px solid var(--input-border);
+  background: transparent;
+  color: var(--text-primary);
+  outline: none;
+}
+
+.password-wrapper {
+  position: relative;
+}
+
+.password-wrapper input {
+  padding-right: 46px; /* space for the toggle button */
+}
+
+.password-toggle-btn {
+  position: absolute;
+  right: 6px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: transparent;
+  border: none;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: var(--text-secondary);
+  border-radius: 6px;
+}
+
+.password-toggle-btn:hover {
+  background: var(--input-focus);
+  color: var(--text-primary);
+}
+
+.primary-btn {
+  width: 100%;
+  padding: 0.9rem;
+  border-radius: 8px;
+  background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+  border: none;
+  color: var(--text-inverse);
+  font-weight: 700;
+  cursor: pointer;
+}
+
+/* Ensure the small password toggle button isn't affected by the global `form button` rule */
+form .password-wrapper .password-toggle-btn {
+  width: 36px !important;
+  height: 36px !important;
+  padding: 0 !important;
+  position: absolute !important;
+  right: 6px !important;
+  top: 50% !important;
+  transform: translateY(-50%) !important;
+  background: transparent !important;
+  border: none !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  cursor: pointer !important;
+  color: var(--text-secondary) !important;
+  border-radius: 6px !important;
+}
+
+form .password-wrapper input {
+  padding-right: 52px !important;
+}
+
 /* Hero Section */
 .hero {
   text-align: center;
