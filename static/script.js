@@ -69,6 +69,23 @@ function initPage() {
 
   // Password show/hide toggle: buttons with class .password-toggle-btn
   document.querySelectorAll('.password-toggle-btn').forEach(function (btn) {
+    // helper to sync button state based on input.type
+    function syncState() {
+      var wrapper = btn.closest('.password-wrapper');
+      if (!wrapper) return;
+      var input = wrapper.querySelector('input[type="password"], input[type="text"]');
+      if (!input) return;
+      var isHidden = input.getAttribute('type') === 'password';
+      // aria-pressed true means password is visible
+      btn.setAttribute('aria-pressed', isHidden ? 'false' : 'true');
+      btn.setAttribute('aria-label', isHidden ? 'Show password' : 'Hide password');
+      btn.setAttribute('title', isHidden ? 'Show password' : 'Hide password');
+    }
+
+    // initialize state on load
+    syncState();
+
+    // click handler toggles input type and updates attributes
     btn.addEventListener('click', function (ev) {
       ev.preventDefault();
       var wrapper = btn.closest('.password-wrapper');
@@ -78,14 +95,26 @@ function initPage() {
       var isHidden = input.getAttribute('type') === 'password';
       if (isHidden) {
         input.setAttribute('type', 'text');
-        btn.setAttribute('aria-pressed', 'true');
-        btn.setAttribute('aria-label', 'Hide password');
       } else {
         input.setAttribute('type', 'password');
-        btn.setAttribute('aria-pressed', 'false');
-        btn.setAttribute('aria-label', 'Show password');
       }
+      // Accessibility + visual sync
+      syncState();
+      // keep focus on the input after toggling for convenience
+      try { input.focus(); } catch (e) {}
     });
+
+    // If the input value or type changes elsewhere, keep button in sync
+    var wrapper = btn.closest('.password-wrapper');
+    if (wrapper) {
+      var inputEl = wrapper.querySelector('input[type="password"], input[type="text"]');
+      if (inputEl) {
+        inputEl.addEventListener('input', function () { /* noop: placeholder */ });
+        // If some script changes type, observe it
+        var observer = new MutationObserver(function () { syncState(); });
+        observer.observe(inputEl, { attributes: true, attributeFilter: ['type'] });
+      }
+    }
   });
 }
 

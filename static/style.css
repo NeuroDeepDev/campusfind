@@ -775,6 +775,65 @@ form .password-wrapper input {
   padding-right: 52px !important;
 }
 
+/* Toggle which icon is visible depending on aria-pressed */
+.password-toggle-btn .icon-show,
+.password-toggle-btn .icon-hide {
+  display: none;
+}
+
+.password-toggle-btn[aria-pressed="true"] .icon-show {
+  display: inline-flex;
+}
+.password-toggle-btn[aria-pressed="true"] .icon-hide {
+  display: none;
+}
+
+.password-toggle-btn[aria-pressed="false"] .icon-hide {
+  display: inline-flex;
+}
+.password-toggle-btn[aria-pressed="false"] .icon-show {
+  display: none;
+}
+
+.password-toggle-btn svg {
+  width: 20px;
+  height: 20px;
+}
+
+/* Make the toggle visually clearer when active */
+.password-toggle-btn {
+  transition: background-color 180ms ease, color 180ms ease, transform 120ms ease;
+}
+
+.password-toggle-btn:focus {
+  outline: 3px solid rgba(61,184,170,0.25);
+  outline-offset: 2px;
+}
+
+.password-toggle-btn[aria-pressed="true"] {
+  background: var(--accent-primary);
+  color: var(--text-inverse) !important;
+  transform: translateY(-50%) scale(1.02);
+}
+
+.password-toggle-btn[aria-pressed="false"] {
+  background: transparent;
+  color: var(--text-secondary) !important;
+}
+
+/* Make the slash on the hidden icon more visible by increasing stroke color */
+.password-toggle-btn[aria-pressed="false"] .icon-hide path,
+.password-toggle-btn[aria-pressed="false"] .icon-hide line {
+  stroke: var(--text-secondary);
+  stroke-width: 2.2px;
+}
+
+.password-toggle-btn[aria-pressed="true"] .icon-show path,
+.password-toggle-btn[aria-pressed="true"] .icon-show circle {
+  stroke: var(--text-inverse);
+  stroke-width: 2.2px;
+}
+
 /* Messages shown in forms (errors, info) */
 .form-messages {
   list-style: none;
