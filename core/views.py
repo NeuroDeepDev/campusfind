@@ -71,13 +71,22 @@ def student_reports(request, student_id):
 
 def submit_report(request):
     if request.method == 'POST':
-        form = ReportForm(request.POST)
+        if request.POST.get('report_type'):
+            data = request.POST.copy()
+            data['report_type'] = request.POST.get('report_type')
+        else:
+            data = request.POST
+        form = ReportForm(data, request.FILES)
         if form.is_valid():
-            form.save()
+            report = form.save(commit=False)
+            if request.user.is_authenticated and hasattr(request.user, 'student_profile'):
+                report.reporter = request.user.student_profile
+            report.save()
+            messages.success(request, 'Your report has been submitted successfully.')
             return redirect('items_list')
     else:
         form = ReportForm()
-    return render(request, 'submit_report.html', {'form': form})
+    return render(request, 'report_wizard.html', {'form': form})
 
 
 def submit_claim(request):

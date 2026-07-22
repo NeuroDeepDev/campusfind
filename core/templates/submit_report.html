@@ -1,9 +1,122 @@
 {% extends 'base.html' %}
 {% block content %}
   <h2>Submit Report</h2>
-  <form method="post" id="report-form">
+  <form method="post" enctype="multipart/form-data" id="report-form" novalidate>
     {% csrf_token %}
-    {{ form.as_p }}
-    <button type="submit">Submit</button>
+    {{ form.non_field_errors }}
+
+    <section class="form-section">
+      <h3>Report Type</h3>
+      <div class="form-row">{{ form.report_type.label_tag }}{{ form.report_type }}{{ form.report_type.errors }}</div>
+    </section>
+
+    <section class="form-section">
+      <h3>Item Information</h3>
+      <div class="form-row">{{ form.item_name.label_tag }}{{ form.item_name }}{{ form.item_name.errors }}</div>
+      <div class="form-row">{{ form.category.label_tag }}{{ form.category }}{{ form.category.errors }}</div>
+    </section>
+
+    <section class="form-section">
+      <h3>Media Upload</h3>
+      <p class="section-note">Upload up to 3 images to help identify the item visually.</p>
+      <div class="form-row">{{ form.image1.label_tag }}{{ form.image1 }}{{ form.image1.errors }}</div>
+      <div class="form-row">{{ form.image2.label_tag }}{{ form.image2 }}{{ form.image2.errors }}</div>
+      <div class="form-row">{{ form.image3.label_tag }}{{ form.image3 }}{{ form.image3.errors }}</div>
+      <div id="image-previews" class="image-previews"></div>
+    </section>
+
+    <section class="form-section">
+      <h3>Item Details</h3>
+      <div class="form-row">{{ form.description.label_tag }}{{ form.description }}{{ form.description.errors }}</div>
+      <div class="form-row">{{ form.brand.label_tag }}{{ form.brand }}{{ form.brand.errors }}</div>
+      <div class="form-row">{{ form.color.label_tag }}{{ form.color }}{{ form.color.errors }}</div>
+      <div class="form-row">{{ form.distinguishing_features.label_tag }}{{ form.distinguishing_features }}{{ form.distinguishing_features.errors }}</div>
+      <div class="form-row found-only">{{ form.condition.label_tag }}{{ form.condition }}{{ form.condition.errors }}</div>
+    </section>
+
+    <section class="form-section">
+      <h3>Location & Time</h3>
+      <div class="form-row">{{ form.location.label_tag }}{{ form.location }}{{ form.location.errors }}</div>
+      <div class="form-row">{{ form.date_lost_found.label_tag }}{{ form.date_lost_found }}{{ form.date_lost_found.errors }}</div>
+      <div class="form-row">{{ form.time_lost_found.label_tag }}{{ form.time_lost_found }}{{ form.time_lost_found.errors }}</div>
+    </section>
+
+    <section class="form-section">
+      <h3>Additional Information</h3>
+      <div class="form-row">{{ form.details.label_tag }}{{ form.details }}{{ form.details.errors }}</div>
+    </section>
+
+    <button type="submit" class="submit-button">Submit Report</button>
   </form>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      const reportType = document.getElementById('id_report_type');
+      const locationLabel = document.querySelector('label[for="id_location"]');
+      const dateLabel = document.querySelector('label[for="id_date_lost_found"]');
+      const timeLabel = document.querySelector('label[for="id_time_lost_found"]');
+      const foundOnlyRows = document.querySelectorAll('.found-only');
+      const previewContainer = document.getElementById('image-previews');
+
+      function updateFormSections() {
+        const isFound = reportType && reportType.value === 'FOUND';
+        foundOnlyRows.forEach(row => row.style.display = isFound ? 'block' : 'none');
+        if (locationLabel) {
+          locationLabel.textContent = isFound ? 'Found Location *' : 'Lost Location *';
+        }
+        if (dateLabel) {
+          dateLabel.textContent = isFound ? 'Date Found *' : 'Date Lost *';
+        }
+        if (timeLabel) {
+          timeLabel.textContent = isFound ? 'Time Found (Optional)' : 'Time Lost (Optional)';
+        }
+      }
+
+      function createImagePreview(file) {
+        const preview = document.createElement('div');
+        preview.className = 'image-preview';
+        const title = document.createElement('span');
+        title.textContent = file.name;
+        preview.appendChild(title);
+        if (file.type.startsWith('image/')) {
+          const reader = new FileReader();
+          reader.onload = function (event) {
+            const img = document.createElement('img');
+            img.src = event.target.result;
+            img.alt = file.name;
+            img.className = 'preview-thumb';
+            preview.appendChild(img);
+          };
+          reader.readAsDataURL(file);
+        }
+        return preview;
+      }
+
+      function buildPreviews() {
+        previewContainer.innerHTML = '';
+        [1, 2, 3].forEach(index => {
+          const input = document.getElementById(`id_image${index}`);
+          if (!input || !input.files) {
+            return;
+          }
+          Array.from(input.files).forEach(file => {
+            previewContainer.appendChild(createImagePreview(file));
+          });
+        });
+      }
+
+      [1, 2, 3].forEach(index => {
+        const input = document.getElementById(`id_image${index}`);
+        if (!input) {
+          return;
+        }
+        input.addEventListener('change', buildPreviews);
+      });
+
+      if (reportType) {
+        reportType.addEventListener('change', updateFormSections);
+        updateFormSections();
+      }
+    });
+  </script>
 {% endblock %}

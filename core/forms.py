@@ -13,7 +13,122 @@ class ItemForm(forms.ModelForm):
 class ReportForm(forms.ModelForm):
     class Meta:
         model = Report
-        fields = ['item', 'reporter', 'report_type', 'details']
+        fields = [
+            'item_name',
+            'category',
+            'report_type',
+            'description',
+            'brand',
+            'model_number',
+            'serial_number',
+            'material',
+            'engraving_details',
+            'document_type',
+            'color',
+            'distinguishing_features',
+            'location',
+            'date_lost_found',
+            'time_lost_found',
+            'condition',
+            'image1',
+            'image2',
+            'image3',
+            'details',
+        ]
+        widgets = {
+            'item_name': forms.TextInput(attrs={'placeholder': 'e.g. Wallet, iPhone, Black backpack', 'class': 'form-control'}),
+            'category': forms.Select(attrs={'class': 'form-control'}),
+            'report_type': forms.HiddenInput(attrs={'id': 'wizard-report-type'}),
+            'description': forms.Textarea(attrs={'placeholder': 'Describe the item in detail with identifying marks, colors, and condition.', 'rows': 4, 'class': 'form-control'}),
+            'brand': forms.TextInput(attrs={'placeholder': 'Brand or manufacturer (optional)', 'class': 'form-control'}),
+            'model_number': forms.TextInput(attrs={'placeholder': 'Model number (electronics only)', 'class': 'form-control dynamic-field hidden'}),
+            'serial_number': forms.TextInput(attrs={'placeholder': 'Serial number (electronics only)', 'class': 'form-control dynamic-field hidden'}),
+            'material': forms.TextInput(attrs={'placeholder': 'Material (jewelry only)', 'class': 'form-control dynamic-field hidden'}),
+            'engraving_details': forms.Textarea(attrs={'placeholder': 'Engraving or personalization details (jewelry only)', 'rows': 2, 'class': 'form-control dynamic-field hidden'}),
+            'document_type': forms.TextInput(attrs={'placeholder': 'Type of document (documents only)', 'class': 'form-control dynamic-field hidden'}),
+            'color': forms.TextInput(attrs={'placeholder': 'Color of the item', 'class': 'form-control'}),
+            'distinguishing_features': forms.Textarea(attrs={'placeholder': 'Any scratches, stickers, or marks that stand out.', 'rows': 3, 'class': 'form-control'}),
+            'location': forms.TextInput(attrs={'placeholder': 'Where was the item lost or found?', 'class': 'form-control location-input'}),
+            'date_lost_found': forms.DateInput(attrs={'type': 'date', 'class': 'form-control'}),
+            'time_lost_found': forms.TimeInput(attrs={'type': 'time', 'class': 'form-control'}),
+            'condition': forms.TextInput(attrs={'placeholder': 'Condition for found items only', 'class': 'form-control found-only-field hidden'}),
+            'image1': forms.ClearableFileInput(attrs={'class': 'form-control-file file-input', 'accept': 'image/png,image/jpeg'}),
+            'image2': forms.ClearableFileInput(attrs={'class': 'form-control-file file-input', 'accept': 'image/png,image/jpeg'}),
+            'image3': forms.ClearableFileInput(attrs={'class': 'form-control-file file-input', 'accept': 'image/png,image/jpeg'}),
+            'details': forms.Textarea(attrs={'placeholder': 'Any additional context that may help recover the item.', 'rows': 4, 'class': 'form-control'}),
+        }
+        labels = {
+            'item_name': 'Item Name',
+            'category': 'Category',
+            'description': 'Detailed Description',
+            'location': 'Lost/Found Location',
+            'date_lost_found': 'Date Lost/Found',
+            'time_lost_found': 'Time Lost/Found (Optional)',
+            'details': 'Additional Notes',
+        }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        category_icons = {
+            'Electronics': '📱',
+            'Jewelry': '💍',
+            'Wallet': '👛',
+            'Keys': '🔑',
+            'Documents': '📄',
+            'Bags': '🎒',
+            'Clothing': '👕',
+            'Watch': '⌚',
+            'Books': '📚',
+            'Other': '📦',
+        }
+        choices = []
+        for value, label in self.fields['category'].choices:
+            emoji = ''
+            if isinstance(label, str):
+                cleaned = label.strip()
+                for key, icon in category_icons.items():
+                    if cleaned.lower().startswith(key.lower()):
+                        emoji = icon + ' '
+                        break
+            choices.append((value, f"{emoji}{label}"))
+        self.fields['category'].choices = choices
+        self.fields['item_name'].required = True
+        self.fields['category'].required = True
+        self.fields['description'].required = True
+        self.fields['location'].required = True
+        self.fields['date_lost_found'].required = True
+        self.fields['item_name'].widget.attrs['required'] = 'required'
+        self.fields['category'].widget.attrs['required'] = 'required'
+        self.fields['description'].widget.attrs['required'] = 'required'
+        self.fields['location'].widget.attrs['required'] = 'required'
+        self.fields['date_lost_found'].widget.attrs['required'] = 'required'
+
+    def clean(self):
+        cleaned_data = super().clean()
+        item_name = cleaned_data.get('item_name')
+        category = cleaned_data.get('category')
+        location = cleaned_data.get('location')
+        date_lost_found = cleaned_data.get('date_lost_found')
+
+        if not item_name:
+            raise forms.ValidationError('Please enter the item name.')
+
+        if not category:
+            raise forms.ValidationError('Please select a category for the report.')
+
+        if not location:
+            raise forms.ValidationError('Please enter the lost/found location.')
+
+        if not date_lost_found:
+            raise forms.ValidationError('Please enter the date lost or found.')
+
+        return cleaned_data
+
+    def save(self, commit=True):
+        report = super().save(commit=False)
+        if commit:
+            report.save()
+        return report
 
 
 class ClaimForm(forms.ModelForm):

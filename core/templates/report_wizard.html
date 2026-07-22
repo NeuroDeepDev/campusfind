@@ -1,0 +1,374 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="wizard-shell">
+  <div class="wizard-card">
+    <div class="wizard-header">
+      <div class="wizard-title">
+        <span class="step-label">Report Lost Item</span>
+        <h1>Submit your lost or found item report</h1>
+        <p class="subtext">A polished, guided reporting experience for fast recovery and reliable matching.</p>
+      </div>
+      <div class="progress-pill">Step <span class="current-step">1</span> of 6</div>
+    </div>
+
+    <div class="wizard-progress">
+      <div class="progress-track">
+        <div class="progress-fill" style="width: 16.66%"></div>
+      </div>
+      <div class="progress-steps">
+        <span class="progress-step active">Type</span>
+        <span class="progress-step">Item</span>
+        <span class="progress-step">Images</span>
+        <span class="progress-step">Details</span>
+        <span class="progress-step">Location</span>
+        <span class="progress-step">Extras</span>
+      </div>
+    </div>
+
+    <form method="post" enctype="multipart/form-data" id="wizard-form" class="wizard-form">
+      {% csrf_token %}
+      {{ form.non_field_errors }}
+
+      <div class="wizard-step wizard-step-active" data-step="1">
+        <div class="section-header">
+          <h2>Choose report type</h2>
+          <p>Tell us whether the item is lost or found so we can tailor the rest of the form.</p>
+        </div>
+        <div class="card-grid">
+          <button type="button" class="type-card type-card-selected" data-value="LOST" aria-pressed="true">
+            <span class="card-icon">🔴</span>
+            <strong>Lost Item</strong>
+            <p>Report something you lost and help recover it quickly.</p>
+          </button>
+          <button type="button" class="type-card" data-value="FOUND" aria-pressed="false">
+            <span class="card-icon">🟢</span>
+            <strong>Found Item</strong>
+            <p>Submit a found item report to reunite it with its owner.</p>
+          </button>
+        </div>
+        {{ form.report_type }}
+      </div>
+
+      <div class="wizard-step" data-step="2">
+        <div class="section-header">
+          <h2>Item information</h2>
+          <p>Start with the basics so your report is easy to find.</p>
+        </div>
+        <div class="field-grid">
+          <label class="floating-label" for="id_item_name">
+            {{ form.item_name }}
+            <span>Item Name *</span>
+          </label>
+          <label class="floating-label" for="id_category">
+            {{ form.category }}
+            <span>Category *</span>
+          </label>
+        </div>
+      </div>
+
+      <div class="wizard-step" data-step="3">
+        <div class="section-header">
+          <h2>Upload item images</h2>
+          <p>Add up to 3 photos for fast visual matching.</p>
+        </div>
+        <div class="upload-panel" id="upload-panel">
+          <div class="upload-dropzone" id="dropzone">
+            <span class="upload-icon">📤</span>
+            <strong>Drag & drop images here</strong>
+            <p>or click to browse. JPG, PNG, JPEG only. Max 3 files.</p>
+          </div>
+          <div class="upload-hint">You can upload up to 3 images. Preview and remove before submission.</div>
+        </div>
+        <div class="image-previews" id="image-previews"></div>
+        <div class="hidden-inputs">
+          {{ form.image1 }}
+          {{ form.image2 }}
+          {{ form.image3 }}
+        </div>
+      </div>
+
+      <div class="wizard-step" data-step="4">
+        <div class="section-header">
+          <h2>Item details</h2>
+          <p>Provide characteristics that make the item easy to identify.</p>
+        </div>
+        <div class="field-grid field-grid-2">
+          <label class="floating-label" for="id_description">
+            {{ form.description }}
+            <span>Detailed Description *</span>
+            <div class="char-counter"><span id="description-count">0</span>/250</div>
+          </label>
+          <div class="field-column">
+            <label class="floating-label" for="id_brand">
+              {{ form.brand }}
+              <span>Brand</span>
+            </label>
+            <label class="floating-label" for="id_color">
+              {{ form.color }}
+              <span>Color</span>
+            </label>
+            <label class="floating-label" for="id_distinguishing_features">
+              {{ form.distinguishing_features }}
+              <span>Distinguishing Features</span>
+            </label>
+            <label class="floating-label dynamic-field hidden" for="id_model_number">
+              {{ form.model_number }}
+              <span>Model Number</span>
+            </label>
+            <label class="floating-label dynamic-field hidden" for="id_serial_number">
+              {{ form.serial_number }}
+              <span>Serial Number</span>
+            </label>
+            <label class="floating-label dynamic-field hidden" for="id_material">
+              {{ form.material }}
+              <span>Material</span>
+            </label>
+            <label class="floating-label dynamic-field hidden" for="id_engraving_details">
+              {{ form.engraving_details }}
+              <span>Engraving Details</span>
+            </label>
+            <label class="floating-label dynamic-field hidden" for="id_document_type">
+              {{ form.document_type }}
+              <span>Document Type</span>
+            </label>
+            <label class="floating-label found-only-field hidden" for="id_condition">
+              {{ form.condition }}
+              <span>Condition (Found only)</span>
+            </label>
+          </div>
+        </div>
+      </div>
+
+      <div class="wizard-step" data-step="5">
+        <div class="section-header">
+          <h2>Location & time</h2>
+          <p>Where and when did you lose or find the item?</p>
+        </div>
+        <div class="field-grid">
+          <label class="floating-label" for="id_location">
+            {{ form.location }}
+            <span>Lost/Found Location *</span>
+          </label>
+          <label class="floating-label" for="id_date_lost_found">
+            {{ form.date_lost_found }}
+            <span>Date Lost/Found *</span>
+          </label>
+          <label class="floating-label" for="id_time_lost_found">
+            {{ form.time_lost_found }}
+            <span>Time Lost/Found</span>
+          </label>
+        </div>
+        <button type="button" class="geo-btn" id="current-location-btn">Use current location</button>
+      </div>
+
+      <div class="wizard-step" data-step="6">
+        <div class="section-header">
+          <h2>Additional information</h2>
+          <p>Anything else that may help identify the item.</p>
+        </div>
+        <label class="floating-label" for="id_details">
+          {{ form.details }}
+          <span>Additional Notes</span>
+        </label>
+      </div>
+
+      <div class="wizard-controls">
+        <button type="button" class="wizard-btn secondary" id="prev-step" disabled>Back</button>
+        <button type="button" class="wizard-btn primary" id="next-step">Next</button>
+      </div>
+    </form>
+
+    <div class="success-card hidden" id="success-card">
+      <div class="success-icon">✅</div>
+      <h2>Report submitted</h2>
+      <p>Your report is saved and visible to the CampusFind team. We’ll notify you when a match is found.</p>
+      <a href="/" class="wizard-btn primary">Return home</a>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    const steps = Array.from(document.querySelectorAll('.wizard-step'));
+    const progressSteps = Array.from(document.querySelectorAll('.progress-step'));
+    const progressFill = document.querySelector('.progress-fill');
+    const currentStepIndicator = document.querySelector('.current-step');
+    const nextBtn = document.getElementById('next-step');
+    const prevBtn = document.getElementById('prev-step');
+    const reportTypeInput = document.getElementById('wizard-report-type');
+    const typeCards = Array.from(document.querySelectorAll('.type-card'));
+    const foundOnlyFields = Array.from(document.querySelectorAll('.found-only-field'));
+    const dropzone = document.getElementById('dropzone');
+    const imagePreviews = document.getElementById('image-previews');
+    const fileInputs = Array.from(document.querySelectorAll('.file-input'));
+    const currentLocationBtn = document.getElementById('current-location-btn');
+    const categorySelect = document.getElementById('id_category');
+    const descriptionInput = document.getElementById('id_description');
+    const descriptionCounter = document.getElementById('description-count');
+    const dynamicFields = Array.from(document.querySelectorAll('.dynamic-field'));
+
+    let activeStep = 0;
+    const totalSteps = steps.length;
+
+    function updateStep(target) {
+      activeStep = Math.max(0, Math.min(target, totalSteps - 1));
+      steps.forEach((step, index) => {
+        step.classList.toggle('wizard-step-active', index === activeStep);
+      });
+      progressSteps.forEach((step, index) => {
+        step.classList.toggle('active', index <= activeStep);
+      });
+      progressFill.style.width = `${((activeStep + 1) / totalSteps) * 100}%`;
+      currentStepIndicator.textContent = activeStep + 1;
+      prevBtn.disabled = activeStep === 0;
+      nextBtn.textContent = activeStep === totalSteps - 1 ? 'Submit report' : 'Next';
+    }
+
+    function setReportType(value) {
+      reportTypeInput.value = value;
+      typeCards.forEach(card => {
+        const isSelected = card.dataset.value === value;
+        card.classList.toggle('type-card-selected', isSelected);
+        card.setAttribute('aria-pressed', isSelected);
+      });
+      foundOnlyFields.forEach(field => {
+        field.classList.toggle('hidden', value !== 'FOUND');
+      });
+    }
+
+    function updateCategoryFields() {
+      const categoryText = categorySelect.options[categorySelect.selectedIndex]?.text?.toLowerCase() || '';
+      dynamicFields.forEach(field => field.classList.add('hidden'));
+
+      if (categoryText.includes('electronics')) {
+        document.getElementById('id_model_number').closest('label').classList.remove('hidden');
+        document.getElementById('id_serial_number').closest('label').classList.remove('hidden');
+      } else if (categoryText.includes('jewelry')) {
+        document.getElementById('id_material').closest('label').classList.remove('hidden');
+        document.getElementById('id_engraving_details').closest('label').classList.remove('hidden');
+      } else if (categoryText.includes('documents')) {
+        document.getElementById('id_document_type').closest('label').classList.remove('hidden');
+      }
+    }
+
+    function updateDescriptionCounter() {
+      if (!descriptionInput || !descriptionCounter) return;
+      const length = descriptionInput.value.length;
+      descriptionCounter.textContent = Math.min(length, 250);
+      descriptionCounter.classList.toggle('overlimit', length > 250);
+    }
+
+    function validateCurrentStep() {
+      const current = steps[activeStep];
+      const requiredFields = Array.from(current.querySelectorAll('input[required], textarea[required], select[required]'));
+      return requiredFields.every(field => field.value.trim());
+    }
+
+    function createPreview(file, index) {
+      const container = document.createElement('div');
+      container.className = 'preview-card';
+
+      const img = document.createElement('img');
+      img.src = URL.createObjectURL(file);
+      img.alt = file.name;
+      img.className = 'preview-thumb';
+
+      const removeBtn = document.createElement('button');
+      removeBtn.type = 'button';
+      removeBtn.className = 'preview-remove';
+      removeBtn.textContent = 'Remove';
+      removeBtn.addEventListener('click', function () {
+        fileInputs[index].value = '';
+        container.remove();
+      });
+
+      container.appendChild(img);
+      container.appendChild(removeBtn);
+      return container;
+    }
+
+    function refreshPreviews() {
+      imagePreviews.innerHTML = '';
+      fileInputs.forEach((input, index) => {
+        if (input.files && input.files[0]) {
+          imagePreviews.appendChild(createPreview(input.files[0], index));
+        }
+      });
+    }
+
+    typeCards.forEach(card => {
+      card.addEventListener('click', () => setReportType(card.dataset.value));
+    });
+
+    if (categorySelect) {
+      categorySelect.addEventListener('change', updateCategoryFields);
+    }
+    if (descriptionInput) {
+      descriptionInput.addEventListener('input', updateDescriptionCounter);
+    }
+
+    nextBtn.addEventListener('click', function () {
+      if (activeStep === totalSteps - 1) {
+        if (!validateCurrentStep()) {
+          alert('Please complete all required fields before submitting.');
+          return;
+        }
+        document.getElementById('wizard-form').submit();
+        return;
+      }
+      updateStep(activeStep + 1);
+    });
+
+    prevBtn.addEventListener('click', function () {
+      updateStep(activeStep - 1);
+    });
+
+    dropzone.addEventListener('click', () => fileInputs[0].click());
+
+    dropzone.addEventListener('dragover', function (event) {
+      event.preventDefault();
+      dropzone.classList.add('drag-over');
+    });
+
+    dropzone.addEventListener('dragleave', function () {
+      dropzone.classList.remove('drag-over');
+    });
+
+    dropzone.addEventListener('drop', function (event) {
+      event.preventDefault();
+      dropzone.classList.remove('drag-over');
+      const files = Array.from(event.dataTransfer.files).filter(file => file.type.startsWith('image/'));
+      files.slice(0, 3).forEach((file, index) => {
+        const dataTransfer = new DataTransfer();
+        dataTransfer.items.add(file);
+        fileInputs[index].files = dataTransfer.files;
+      });
+      refreshPreviews();
+    });
+
+    fileInputs.forEach((input) => {
+      input.addEventListener('change', refreshPreviews);
+    });
+
+    currentLocationBtn.addEventListener('click', function () {
+      if (!navigator.geolocation) {
+        alert('Geolocation is not supported by your browser.');
+        return;
+      }
+      navigator.geolocation.getCurrentPosition(function (position) {
+        document.getElementById('id_location').value = `Lat ${position.coords.latitude.toFixed(4)}, Lon ${position.coords.longitude.toFixed(4)}`;
+      }, function () {
+        alert('Unable to retrieve current location.');
+      });
+    });
+
+    updateStep(0);
+    setReportType(reportTypeInput?.value || 'LOST');
+    updateCategoryFields();
+    updateDescriptionCounter();
+  });
+</script>
+{% endblock %}

@@ -69,15 +69,32 @@ class Report(models.Model):
     ]
 
     report_id = models.AutoField(primary_key=True)
-    item = models.ForeignKey(Item, on_delete=models.CASCADE, related_name='reports')
+    item = models.ForeignKey(Item, on_delete=models.CASCADE, related_name='reports', null=True, blank=True)
+    item_name = models.CharField(max_length=200, blank=True, null=True)
+    category = models.ForeignKey(Category, on_delete=models.SET_NULL, null=True, blank=True, related_name='reports')
     reporter = models.ForeignKey(Student, on_delete=models.SET_NULL, null=True, blank=True, related_name='reports')
     report_type = models.CharField(max_length=20, choices=REPORT_TYPE_CHOICES)
     report_date = models.DateTimeField(auto_now_add=True)
-    details = models.TextField(blank=True, null=True)
+    description = models.TextField(blank=True, null=True)
+    brand = models.CharField(max_length=100, blank=True, null=True)
+    color = models.CharField(max_length=50, blank=True, null=True)
+    distinguishing_features = models.TextField(blank=True, null=True)
+    location = models.CharField(max_length=200, blank=True, null=True)
+    date_lost_found = models.DateField(blank=True, null=True)
+    time_lost_found = models.TimeField(blank=True, null=True)
+    condition = models.CharField(max_length=100, blank=True, null=True)
+    image1 = models.ImageField(upload_to='report_images/', blank=True, null=True)
+    image2 = models.ImageField(upload_to='report_images/', blank=True, null=True)
+    image3 = models.ImageField(upload_to='report_images/', blank=True, null=True)
+    model_number = models.CharField(max_length=100, blank=True, null=True)
+    serial_number = models.CharField(max_length=100, blank=True, null=True)
+    material = models.CharField(max_length=100, blank=True, null=True)
+    engraving_details = models.TextField(blank=True, null=True)
+    document_type = models.CharField(max_length=100, blank=True, null=True)
+    details = models.TextField('Additional Notes', blank=True, null=True)
 
     def __str__(self):
-        return f"Report {self.report_id} - {self.report_type}"
-
+        return f"Report {self.report_id} - {self.report_type} - {self.item_name or self.item}"
 
 class Claim(models.Model):
     CLAIM_STATUS = [
