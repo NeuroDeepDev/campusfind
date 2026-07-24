@@ -1,7 +1,15 @@
 from django import forms
-from .models import Item, Report, Claim, Student, LostItem
+from .models import Item, Report, Claim, Student, LostItem, Category
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
+
+
+class DisabledPlaceholderSelect(forms.Select):
+    def create_option(self, name, value, label, selected, index, subindex=None, attrs=None, **kwargs):
+        option = super().create_option(name, value, label, selected, index, subindex=subindex, attrs=attrs, **kwargs)
+        if value == '':
+            option['attrs']['disabled'] = 'disabled'
+        return option
 
 
 class ItemForm(forms.ModelForm):
@@ -11,6 +19,22 @@ class ItemForm(forms.ModelForm):
 
 
 class ReportForm(forms.ModelForm):
+    STANDARD_CATEGORY_CHOICES = [
+        ('', 'Select any'),
+        ('Electronics', 'Electronics'),
+        ('Documents', 'Documents'),
+        ('Jewelry & Valuables', 'Jewelry & Valuables'),
+        ('Stationery & Books', 'Stationery & Books'),
+        ('Personal Belongings', 'Personal Belongings'),
+        ('Others', 'Others'),
+    ]
+
+    category = forms.ChoiceField(
+        choices=STANDARD_CATEGORY_CHOICES,
+        required=True,
+        widget=DisabledPlaceholderSelect(attrs={'class': 'form-control'}),
+    )
+
     class Meta:
         model = Report
         fields = [
@@ -69,29 +93,7 @@ class ReportForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        category_icons = {
-            'Electronics': '📱',
-            'Jewelry': '💍',
-            'Wallet': '👛',
-            'Keys': '🔑',
-            'Documents': '📄',
-            'Bags': '🎒',
-            'Clothing': '👕',
-            'Watch': '⌚',
-            'Books': '📚',
-            'Other': '📦',
-        }
-        choices = []
-        for value, label in self.fields['category'].choices:
-            emoji = ''
-            if isinstance(label, str):
-                cleaned = label.strip()
-                for key, icon in category_icons.items():
-                    if cleaned.lower().startswith(key.lower()):
-                        emoji = icon + ' '
-                        break
-            choices.append((value, f"{emoji}{label}"))
-        self.fields['category'].choices = choices
+        self.fields['category'].choices = self.STANDARD_CATEGORY_CHOICES
         self.fields['item_name'].required = True
         self.fields['category'].required = True
         self.fields['description'].required = True
@@ -126,6 +128,10 @@ class ReportForm(forms.ModelForm):
 
     def save(self, commit=True):
         report = super().save(commit=False)
+        category_name = self.cleaned_data.get('category')
+        if category_name:
+            category_obj, _ = Category.objects.get_or_create(category_name=category_name)
+            report.category = category_obj
         if commit:
             report.save()
         return report
