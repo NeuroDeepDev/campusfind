@@ -137,10 +137,58 @@ class ReportForm(forms.ModelForm):
         return report
 
 
-class ClaimForm(forms.ModelForm):
-    class Meta:
-        model = Claim
-        fields = ['item', 'claimer', 'evidence']
+class ClaimForm(forms.Form):
+    item = forms.ModelChoiceField(queryset=Item.objects.all(), required=True, widget=forms.HiddenInput())
+    claimant_name = forms.CharField(max_length=200, required=True, label='Full Name')
+    claimant_email = forms.EmailField(required=True, label='Email Address')
+    claimant_phone = forms.CharField(max_length=50, required=True, label='Phone Number')
+    identity_proof = forms.FileField(required=True, label='Identity Proof *')
+    ownership_proof = forms.FileField(required=True, label='Ownership Proof *')
+    ownership_description = forms.CharField(required=True, widget=forms.Textarea(attrs={'rows': 5, 'placeholder': 'Describe the item, its brand, color, distinguishing marks, approximate date lost, contents, and any unique identifiers.'}), label='Ownership Description *')
+    additional_evidence = forms.CharField(required=False, widget=forms.Textarea(attrs={'rows': 3, 'placeholder': 'Add any extra context or supporting notes (optional).'}), label='Additional Supporting Evidence')
+    declaration_confirmed = forms.BooleanField(required=True, label='I confirm that the information provided is accurate and truthful.')
+
+    def __init__(self, *args, **kwargs):
+        self.item_instance = kwargs.pop('item', None)
+        super().__init__(*args, **kwargs)
+        if self.item_instance:
+            self.fields['item'].initial = self.item_instance.item_id
+            self.fields['item'].widget = forms.HiddenInput()
+            self.fields['item'].queryset = Item.objects.filter(pk=self.item_instance.pk)
+
+    def clean(self):
+        cleaned_data = super().clean()
+        if not cleaned_data.get('item') and self.item_instance:
+            cleaned_data['item'] = self.item_instance
+        return cleaned_data
+
+    def save(self, commit=True):
+        item = self.cleaned_data['item']
+        claimant_name = self.cleaned_data['claimant_name']
+        claimant_email = self.cleaned_data['claimant_email']
+        claimant_phone = self.cleaned_data['claimant_phone']
+        ownership_description = self.cleaned_data['ownership_description']
+        additional_evidence = self.cleaned_data['additional_evidence']
+        identity_proof = self.cleaned_data['identity_proof']
+        ownership_proof = self.cleaned_data['ownership_proof']
+
+        student = None
+        if self.item_instance and self.item_instance.status == 'FOUND':
+            try:
+                student = Student.objects.get(email__iexact=claimant_email)
+            except Student.DoesNotExist:
+                student = None
+
+        claim = Claim.objects.create(
+            item=item,
+            claimer=student,
+            evidence=f"{ownership_description}\n\nAdditional evidence: {additional_evidence or 'None'}",
+            status='PENDING',
+        )
+
+        if commit:
+            claim.save()
+        return claim
 
 
 class StudentForm(forms.ModelForm):

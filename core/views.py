@@ -89,15 +89,21 @@ def submit_report(request):
     return render(request, 'report_wizard.html', {'form': form})
 
 
-def submit_claim(request):
+def submit_claim(request, item_id=None):
+    item = None
+    if item_id:
+        item = get_object_or_404(Item, item_id=item_id)
+
     if request.method == 'POST':
-        form = ClaimForm(request.POST)
+        form = ClaimForm(request.POST, request.FILES, item=item)
         if form.is_valid():
             form.save()
-            return redirect('items_list')
+            messages.success(request, 'Your claim has been submitted successfully and is now under review.')
+            return redirect('item_detail', item_id=item.item_id if item else form.cleaned_data['item'].item_id)
     else:
-        form = ClaimForm()
-    return render(request, 'submit_claim.html', {'form': form})
+        form = ClaimForm(item=item)
+
+    return render(request, 'submit_claim.html', {'form': form, 'item': item})
 
 
 def register(request):

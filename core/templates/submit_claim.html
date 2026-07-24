@@ -1,9 +1,73 @@
 {% extends 'base.html' %}
 {% block content %}
-  <h2>Submit Claim</h2>
-  <form method="post" id="claim-form">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <button type="submit">Submit Claim</button>
-  </form>
+  <div class="container py-5">
+    <div class="card shadow-sm p-4 p-md-5">
+      <h2 class="mb-3">Submit a Claim</h2>
+      <p class="text-muted mb-4">Provide the details below so the CampusFind team can verify ownership and review your claim securely.</p>
+
+      {% if item %}
+        <div class="alert alert-info mb-4">
+          <strong>Claiming:</strong> {{ item.name }}
+        </div>
+      {% endif %}
+
+      <form method="post" enctype="multipart/form-data" id="claim-form">
+        {% csrf_token %}
+        {{ form.non_field_errors }}
+
+        <div class="row g-3 mb-4">
+          <div class="col-md-6">
+            <label class="form-label" for="id_claimant_name">{{ form.claimant_name.label }}</label>
+            {{ form.claimant_name }}
+            {% if form.claimant_name.errors %}<div class="text-danger small">{{ form.claimant_name.errors }}</div>{% endif %}
+          </div>
+          <div class="col-md-6">
+            <label class="form-label" for="id_claimant_email">{{ form.claimant_email.label }}</label>
+            {{ form.claimant_email }}
+            {% if form.claimant_email.errors %}<div class="text-danger small">{{ form.claimant_email.errors }}</div>{% endif %}
+          </div>
+          <div class="col-md-6">
+            <label class="form-label" for="id_claimant_phone">{{ form.claimant_phone.label }}</label>
+            {{ form.claimant_phone }}
+            {% if form.claimant_phone.errors %}<div class="text-danger small">{{ form.claimant_phone.errors }}</div>{% endif %}
+          </div>
+        </div>
+
+        <div class="mb-4">
+          <label class="form-label" for="id_identity_proof">{{ form.identity_proof.label }}</label>
+          {{ form.identity_proof }}
+          <div class="form-text">Accepted: JPG, PNG, PDF</div>
+          {% if form.identity_proof.errors %}<div class="text-danger small">{{ form.identity_proof.errors }}</div>{% endif %}
+        </div>
+
+        <div class="mb-4">
+          <label class="form-label" for="id_ownership_proof">{{ form.ownership_proof.label }}</label>
+          {{ form.ownership_proof }}
+          <div class="form-text">Upload receipts, invoices, warranty cards, photos, or other ownership evidence.</div>
+          {% if form.ownership_proof.errors %}<div class="text-danger small">{{ form.ownership_proof.errors }}</div>{% endif %}
+        </div>
+
+        <div class="mb-4">
+          <label class="form-label" for="id_ownership_description">{{ form.ownership_description.label }}</label>
+          {{ form.ownership_description }}
+          {% if form.ownership_description.errors %}<div class="text-danger small">{{ form.ownership_description.errors }}</div>{% endif %}
+        </div>
+
+        <div class="mb-4">
+          <label class="form-label" for="id_additional_evidence">{{ form.additional_evidence.label }}</label>
+          {{ form.additional_evidence }}
+          {% if form.additional_evidence.errors %}<div class="text-danger small">{{ form.additional_evidence.errors }}</div>{% endif %}
+        </div>
+
+        <div class="form-check mb-4">
+          {{ form.declaration_confirmed }}
+          <label class="form-check-label" for="id_declaration_confirmed">{{ form.declaration_confirmed.label }}</label>
+          {% if form.declaration_confirmed.errors %}<div class="text-danger small">{{ form.declaration_confirmed.errors }}</div>{% endif %}
+        </div>
+
+        {{ form.item }}
+        <button type="submit" class="btn btn-primary">Submit Claim</button>
+      </form>
+    </div>
+  </div>
 {% endblock %}

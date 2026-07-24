@@ -1,6 +1,7 @@
 from django.test import TestCase
 
-from .forms import ReportForm
+from .forms import ClaimForm, ReportForm
+from .models import Category, Item, Location
 
 
 class ReportFormCategoryTests(TestCase):
@@ -38,3 +39,34 @@ class ReportFormCategoryTests(TestCase):
 
         self.assertFalse(form.is_valid())
         self.assertIn('category', form.errors)
+
+
+class ClaimFormTests(TestCase):
+    def setUp(self):
+        category = Category.objects.create(category_name='Electronics')
+        location = Location.objects.create(building='Library')
+        self.item = Item.objects.create(name='Phone', category=category, description='Black phone', status='FOUND', location=location)
+
+    def test_claim_form_requires_verification_fields(self):
+        form = ClaimForm(item=self.item, data={
+            'claimant_name': 'Ada Lovelace',
+            'claimant_email': 'ada@example.com',
+            'claimant_phone': '1234567890',
+            'ownership_description': 'I bought this phone in 2023.',
+            'declaration_confirmed': True,
+        })
+
+        self.assertFalse(form.is_valid())
+        self.assertIn('identity_proof', form.errors)
+        self.assertIn('ownership_proof', form.errors)
+
+    def test_claim_form_accepts_preselected_item(self):
+        form = ClaimForm(item=self.item, data={
+            'claimant_name': 'Ada Lovelace',
+            'claimant_email': 'ada@example.com',
+            'claimant_phone': '1234567890',
+            'ownership_description': 'I bought this phone in 2023.',
+            'declaration_confirmed': True,
+        })
+
+        self.assertEqual(form.fields['item'].initial, self.item.item_id)
